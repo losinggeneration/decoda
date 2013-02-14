@@ -23,7 +23,11 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef CRITICAL_SECTION_H
 #define CRITICAL_SECTION_H
 
+#ifdef __WINDOWS__
 #include <windows.h>
+#else
+#include <pthread.h>
+#endif
 
 /**
  * Critical section class.
@@ -69,7 +73,11 @@ private:
 
 private:
 
+#ifdef __WINDOWS__
     CRITICAL_SECTION    m_criticalSection;
+#else
+	pthread_mutex_t m_criticalSection;
+#endif
 
 };
 

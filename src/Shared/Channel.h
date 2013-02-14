@@ -23,7 +23,11 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef CHANNEL_H
 #define CHANNEL_H
 
+#include <stdint.h>
+
+#ifdef __WINDOWS__
 #include <windows.h>
+#endif
 #include <string>
 
 /**
@@ -69,7 +73,7 @@ public:
     /**
      * Writes a 32-bit unsigned integer to the channel and returns immediately.
      */
-    bool WriteUInt32(unsigned int value);
+    bool WriteUInt32(uint32_t value);
 
     /**
      * Writes a string to the channel and returns immediately.
@@ -90,7 +94,7 @@ public:
      * Reads a 32-bit unsigned integer from the channel. This operation blocks
      * until the data is available.
      */
-    bool ReadUInt32(unsigned int& value);
+    bool ReadUInt32(uint32_t& value);
 
     /**
      * Reads a string from the channel. This operation blocks until the
@@ -114,19 +118,21 @@ private:
     /**
      * Writes data to the channel and returns immediately.
      */
-    bool Write(const void* buffer, unsigned int length);
+    bool Write(const void* buffer, uint32_t length);
 
     /**
      * Reads data to the channel. Returns when the specified amount has been
      * read or when an error occurs.
      */
-    bool Read(void* buffer, unsigned int length);
+    bool Read(void* buffer, uint32_t length);
 
 private:
 
+#ifdef __WINDOWS__
     HANDLE  m_pipe;
     HANDLE  m_doneEvent;
     HANDLE  m_readEvent;
+#endif
 
     bool    m_creator;
 

@@ -24,7 +24,10 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #define SINGLE_INSTANCE_H
 
 #include <wx/wx.h>
+
+#ifdef __WINDOWS__
 #include <windows.h>
+#endif
 
 /**
  * This class is used to ensure that only a single instance of the application
@@ -51,7 +54,11 @@ public:
      * running. If there's no previous instance, the method returns NULL. The name
      * is a unique identifier that describes the application.
      */
+#ifdef __WINDOWS__
     HWND Connect(HWND hWnd, const char* name);
+#else
+	int Connect(int nop1, const char* nop2);
+#endif
 
     /**
      * Sends the specified command line to the instance.
@@ -67,6 +74,7 @@ private:
 
     static const int s_maxCommandLineLength = 2000;
 
+#ifdef __WINDOWS__
     struct Data
     {
         HWND    hWnd;
@@ -76,7 +84,7 @@ private:
     HANDLE      m_hInstance;
     HANDLE      m_mutex;
     Data*       m_data;
-
+#endif
 };
 
 #endif

@@ -23,7 +23,7 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #include "SystemSettingsPanel.h"
 #include "MainApp.h"
 
-#include <wx/msw/registry.h>
+#include "wx/config.h"
 
 BEGIN_EVENT_TABLE(SystemSettingsPanel, wxPanel)
     EVT_CHECKBOX(       SystemSettingsPanel::ID_CheckForUpdates,    SystemSettingsPanel::OnCheckForUpdates)
@@ -106,7 +106,7 @@ void SystemSettingsPanel::AddFileType(const wxString& ext, int icon)
 
 wxString SystemSettingsPanel::GetOpenCommand() const
 {
-    return wxString::Format("%s \"%%1\"", wxGetApp().GetExeFileName());
+    return wxString::Format(wxString("%s \"%%1\"", wxConvLibc), wxGetApp().GetExeFileName());
 }
 
 void SystemSettingsPanel::ApplyFileAssociations()
@@ -122,8 +122,9 @@ void SystemSettingsPanel::ApplyFileAssociations()
         if (m_fileTypesBox->IsChecked(i) != GetIsRegistered(m_fileTypes[i].ext, openCommand))
         {
 
-            wxString docType = "Decoda" + m_fileTypes[i].ext;
+            wxString docType = wxString("Decoda", wxConvLibc) + m_fileTypes[i].ext;
 
+#ifdef __WINDOWS__
             wxRegKey extKey("HKEY_CLASSES_ROOT\\" + m_fileTypes[i].ext);
             
             wxRegKey iconKey("HKEY_CLASSES_ROOT\\" + docType + "\\DefaultIcon"); 
@@ -165,7 +166,7 @@ void SystemSettingsPanel::ApplyFileAssociations()
                 wxMessageBox("This account has insufficient privileges to update the registry, which is necessary to set file associations.");
                 break;
             }
-
+#endif
         }
     }
 
@@ -192,6 +193,7 @@ bool SystemSettingsPanel::GetIsRegistered(const wxString& ext, const wxString& o
     // Turn off the ugly error messages if we can't access the registry.
     wxLogNull logNo;
 
+#ifdef __WINDOWS__
     wxRegKey extKey("HKEY_CLASSES_ROOT\\" + ext);
     
     if (extKey.Exists())
@@ -214,6 +216,7 @@ bool SystemSettingsPanel::GetIsRegistered(const wxString& ext, const wxString& o
         }
 
     }
+#endif
 
     return false;
 

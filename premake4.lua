@@ -3,10 +3,11 @@ solution "Decoda"
     location "build"
 	--debugdir "working"
 	flags { "No64BitChecks" }
-    
-	defines { "_CRT_SECURE_NO_WARNINGS", "WIN32" }
-    
-    vpaths { 
+
+	configuration "windows"
+		defines { "_CRT_SECURE_NO_WARNINGS", "WIN32" }
+
+    vpaths {
         ["Header Files"] = { "**.h" },
         ["Source Files"] = { "**.cpp" },
 		["Resource Files"] = { "**.rc" },
@@ -15,38 +16,49 @@ solution "Decoda"
 project "Frontend"
     kind "WindowedApp"
 	targetname "Decoda"
-	flags { "WinMain" }
     location "build"
     language "C++"
     files {
 		"src/Frontend/*.h",
 		"src/Frontend/*.cpp",
 		"src/Frontend/*.rc",
-	}		
+	}
     includedirs {
 		"src/Shared",
-		"libs/wxWidgets/include",
-		"libs/wxScintilla/include",
 		"libs/Update/include",
 	}
 	libdirs {
-		"libs/wxWidgets/lib/vc_lib",
-		"libs/wxScintilla/lib",
 		"libs/Update/lib",
 	}
-    links {
-		"comctl32",
-		"rpcrt4",
-		"imagehlp",
-		"Update",
-		"Shared",		
-	}
+
+	configuration "windows"
+		flags { "WinMain" }
+		includedirs {
+			"libs/wxWidgets/include",
+			"libs/wxScintilla/include",
+		}
+		libdirs {
+			"libs/wxWidgets/lib/vc_lib",
+			"libs/wxScintilla/lib",
+		}
+		links {
+			"comctl32",
+			"rpcrt4",
+			"imagehlp",
+			"Update",
+			"Shared",
+		}
+
+	configuration { "linux", "gmake" }
+		buildoptions {
+			os.outputof("wx-config --cflags")
+		}
 
     configuration "Debug"
         defines { "DEBUG" }
         flags { "Symbols" }
         targetdir "bin/debug"
-		includedirs { "libs/wxWidgets/lib/vc_lib/mswd" }
+		--includedirs { "libs/wxWidgets/lib/vc_lib/mswd" }
 		links {
 			"wxbase28d",
 			"wxmsw28d_core",
@@ -80,8 +92,8 @@ project "Frontend"
 			"wxmsw28_richtext",
 			"wxmsw28_html",
 			"wxpng",
-		}		
-		
+		}
+
 project "LuaInject"
     kind "SharedLib"
     location "build"
@@ -90,7 +102,7 @@ project "LuaInject"
     files {
 		"src/LuaInject/*.h",
 		"src/LuaInject/*.cpp",
-	}		
+	}
     includedirs {
 		"src/Shared",
 		"libs/lua/include",
@@ -116,9 +128,9 @@ project "LuaInject"
     configuration "Release"
         defines { "NDEBUG" }
         flags { "Optimize" }
-        targetdir "bin/release"				
+        targetdir "bin/release"
 		links { "tinyxml_STL" }
-		
+
 project "Shared"
     kind "StaticLib"
     location "build"
@@ -126,7 +138,17 @@ project "Shared"
     files {
 		"src/Shared/*.h",
 		"src/Shared/*.cpp",
-	}		
+	}
+	if os.get() == "windows" then
+		excludes {
+			"src/Shared/*_unix.cpp"
+		}
+	else
+		excludes {
+			"src/Shared/*_windows.cpp"
+		}
+
+	end
     includedirs {
 	}
 	libdirs {
@@ -142,5 +164,5 @@ project "Shared"
     configuration "Release"
         defines { "NDEBUG" }
         flags { "Optimize" }
-        targetdir "bin/release"		
-		
+        targetdir "bin/release"
+

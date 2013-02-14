@@ -25,7 +25,10 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <wx/wx.h>
 #include <wx/filename.h>
+
+#ifdef __WINDOWS__
 #include <windows.h>
+#endif
 
 /**
  * Monitors a file to detect changes to it made by another application.

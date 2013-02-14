@@ -25,7 +25,10 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "CriticalSection.h"
 
+#ifdef __WINDOWS__
 #include <windows.h>
+#endif
+
 #include "scc.h"
 
 #include <vector>
